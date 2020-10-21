@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Hello World</title>
+    <url>/2020/10/16/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>YAML语法规则</title>
+    <url>/2020/10/19/test/</url>
+    <content><![CDATA[<h1 id="什么是YAML"><a href="#什么是YAML" class="headerlink" title="什么是YAML"></a>什么是YAML</h1><p>&emsp;&emsp;YML是专门用来写配置文件的语言，非常简洁和强大，远比 JSON 格式方便，它实质上是一种通用的数据串行化格式。</p>
+<a id="more"></a>
+<h1 id="YML的语法规则"><a href="#YML的语法规则" class="headerlink" title="YML的语法规则"></a>YML的语法规则</h1><ul>
+<li>大小写敏感  </li>
+<li>使用缩进表示层级关系  </li>
+<li>缩进时不允许使用TAB键，只允许使用空格</li>
+<li>缩进的空格数目不重要，只要相同层级的元素对应上即可</li>
+</ul>
+<p>/#表示注释，从这个字符一直到行尾，都会被解析器忽略。</p>
+<h1 id="YAML支持三种数据结构类型"><a href="#YAML支持三种数据结构类型" class="headerlink" title="YAML支持三种数据结构类型"></a>YAML支持三种数据结构类型</h1><ul>
+<li>对象：键值对的集合，又称为映射（mapping）/ 哈希（hashes） / 字典（dictionary）</li>
+<li>数组：一组按次序排列的值，又称为序列（sequence） / 列表（list）</li>
+<li>纯量（scalars）：单个的、不可再分的值</li>
+</ul>
+<h1 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h1><p>&emsp;&emsp;对象的一组键值对，使用冒号结构表示。格式为key: value。冒号后面要加一个空格：<br>animal: pets<br>转为javascript如下  </p>
+<pre><code>&#123; animal: &#39;pets&#39; &#125;</code></pre>
+<p>Yaml也允许另一种写法，将所有键值对都写成一个行内对象<br>hash：{name: Steve,foo: bar}<br>转为JavaScript如下<br><code>&#123; hash: &#123; name: &#39;Steve&#39;, foo: &#39;bar&#39; &#125; &#125;</code>  </p>
+<h1 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h1><p>&emsp;&emsp;一组连词线开头的行，构成一个数组。<br>-Cat<br>-Dog<br>-Fish<br>转为JavaScript如下<br><code>[ &#39;Cat&#39;, &#39;Dog&#39;, &#39;Fish&#39; ]</code><br>数据结构的子成员是一个数组，则可以在下面缩进一格。使用一个短横线加一个空格代表一个数组项：<br>数组也可以采用行内表示法<br><code>animal: [cat,Dog]</code><br>较复杂的例子如下<br> companies:<br>                             一<br>                                        id: 1<br>                                        name: company1<br>                                        price: 100<br>                             一<br>                                        id: 2<br>                                        name:company2<br>                                        price:300<br>其等同于companies[{ id:1,name:company1,price:100},{id:2,name:company2,price:300}]<br>常量就不在此做介绍了，很少用到  </p>
+<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><p>… 和—配合使用，在一个配置文件中代表一个文件的结束<br>!! YAML中使用!!做类型强行转换<br>&gt;在字符串中折叠换行，| 保留换行符，这两个符号是YAML中字符串经常使用的符号  </p>
+]]></content>
+      <tags>
+        <tag>tags</tag>
+      </tags>
+  </entry>
+</search>
