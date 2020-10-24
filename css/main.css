@@ -1297,7 +1297,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #ff74e3;
+  background: #2a55ff;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2616,14 +2616,4 @@ hr {
   background: rgba(255,255,255,0.9) none repeat scroll !important;
   -webkit-box-shadow: 0 0 5px rgba(202,203,203,0.5);
   -moz-box-shadow: 0 0 5px rgba(202,203,204,0.5);
-}
-body {
-  background: url("/images/backgroud.jpg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: center;
-}
-.sidebar {
-  opacity: 0.85;
 }
