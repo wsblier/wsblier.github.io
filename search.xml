@@ -20,9 +20,90 @@
 ]]></content>
   </entry>
   <entry>
+    <title>Kafka学习</title>
+    <url>/2020/10/26/Kafka%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<h1 id="Kafaka简介"><a href="#Kafaka简介" class="headerlink" title="Kafaka简介"></a>Kafaka简介</h1><p>&emsp;&emsp;Kafka是最初由Linkedin公司开发，是一个分布式、分区的、多副本的、多订阅者，基于zookeeper协调的分布式日志系统（也可以当做MQ系统），常见可以用于web/nginx日志、访问日志，消息服务等等，Linkedin于2010年贡献给了Apache基金会并成为顶级开源项目。 </p>
+<a id="more"></a> 
+<p>主要应用场景是：日志收集系统和消息系统。<br>kafka主要目标设计如下:  </p>
+<ul>
+<li>以时间复杂度为O(1)的方式提供消息持久化能力，即使对TB级以上数据也能保证常数时间的访问性能。  </li>
+<li>高吞吐率。即使在非常廉价的商用机器上也能做到单机支持每秒100K条消息的传输。  </li>
+<li>支持Kafka Server间的消息分区，及分布式消费，同时保证每个partition内的消息顺序传输。  </li>
+<li>同时支持离线数据处理和实时数据处理。  </li>
+<li>Scale out:支持在线水平扩展。  </li>
+</ul>
+<h1 id="消息系统介绍"><a href="#消息系统介绍" class="headerlink" title="消息系统介绍"></a>消息系统介绍</h1><p>&emsp;&emsp;一个消息系统负责将数据从一个应用传递到另外一个应用，应用只需关注于数据，无需关注数据在两个或多个应用间是如何传递的。分布式消息传递基于可靠的消息队列，在客户端应用和消息系统之间异步传递消息。有两种主要的消息传递模式：点对点传递模式、发布-订阅模式。大部分的消息系统选用发布-订阅模式。Kafka就是一种发布-订阅模式。  </p>
+<ol>
+<li>点对点传递模式  </li>
+</ol>
+<p>&emsp;&emsp;在点对点消息系统中，消息持久化到一个队列中。此时，将有一个或多个消费者消费队列中的数据。但是一条消息只能被消费一次。当一个消费者消费了队列中的某条数据之后，该条数据则从消息队列中删除。该模式即使有多个消费者同时消费数据，也能保证数据处理的顺序。这种架构描述示意图如下:<br><img src="https://i.loli.net/2020/10/26/x5eTdh9fiy6RPw2.jpg" alt="点对点传递模式.jpg"><br>2. 发布订阅传递模式  </p>
+<p>&emsp;&emsp;在发布-订阅消息系统中，消息被持久化到一个topic中。与点对点消息系统不同的是，消费者可以订阅一个或多个topic，消费者可以消费该topic中所有的数据，同一条数据可以被多个消费者消费，数据被消费后不会立马删除。在发布-订阅消息系统中，消息的生产者称为发布者，消费者称为订阅者。该模式的示例图如下：<br><img src="https://i.loli.net/2020/10/26/3zwLoUnhDq2mjPl.jpg" alt="发布订阅模式.jpg"><br>发布者发送到topic的消息，只有订阅了topic的订阅者才会收到消息。不过要设置过期时间  </p>
+<h1 id="kafka的优势"><a href="#kafka的优势" class="headerlink" title="kafka的优势"></a>kafka的优势</h1><h2 id="解耦"><a href="#解耦" class="headerlink" title="解耦"></a>解耦</h2><p>&emsp;&emsp;在项目启动之初来预测将来项目会碰到什么需求，是极其困难的。消息系统在处理过程中间插入了一个隐含的、基于数据的接口层，两边的处理过程都要实现这一接口。这允许你独立的扩展或修改两边的处理过程，只要确保它们遵守同样的接口约束。  </p>
+<h2 id="冗余（副本）"><a href="#冗余（副本）" class="headerlink" title="冗余（副本）"></a>冗余（副本）</h2><p> &emsp;&emsp;有些情况下，处理数据的过程会失败。除非数据被持久化，否则将造成丢失。消息队列把数据进行持久化直到它们已经被完全处理，通过这一方式规避了数据丢失风险。许多消息队列所采用的”插入-获取-删除”范式中，在把一个消息从队列中删除之前，需要你的处理系统明确的指出该消息已经被处理完毕，从而确保你的数据被安全的保存直到你使用完毕。  </p>
+<h2 id="扩展性"><a href="#扩展性" class="headerlink" title="扩展性"></a>扩展性</h2><p> &emsp;&emsp;为消息队列解耦了你的处理过程，所以增大消息入队和处理的频率是很容易的，只要另外增加处理过程即可。不需要改变代码、不需要调节参数。扩展就像调大电力按钮一样简单。  </p>
+<h2 id="削峰"><a href="#削峰" class="headerlink" title="削峰"></a>削峰</h2><p>&emsp;&emsp;访问量剧增的情况下，应用仍然需要继续发挥作用，但是这样的突发流量并不常见；如果为以能处理这类峰值访问为标准来投入资源随时待命无疑是巨大的浪费。使用消息队列能够使关键组件顶住突发的访问压力，而不会因为突发的超负荷的请求而完全崩溃。  </p>
+<h2 id="可恢复性"><a href="#可恢复性" class="headerlink" title="可恢复性"></a>可恢复性</h2><p>&emsp;&emsp;系统的一部分组件失效时，不会影响到整个系统。消息队列降低了进程间的耦合度，所以即使一个处理消息的进程挂掉，加入队列中的消息仍然可以在系统恢复后被处理。  </p>
+<h2 id="顺序保证"><a href="#顺序保证" class="headerlink" title="顺序保证"></a>顺序保证</h2><p>&emsp;&emsp;大多使用场景下，数据处理的顺序都很重要。大部分消息队列本来就是排序的，并且能保证数据会按照特定的顺序来处理。Kafka保证一个Partition内的消息的有序性。  </p>
+<h2 id="缓冲"><a href="#缓冲" class="headerlink" title="缓冲"></a>缓冲</h2><p>&emsp;&emsp;在任何重要的系统中，都会有需要不同的处理时间的元素。例如，加载一张图片比应用过滤器花费更少的时间。消息队列通过一个缓冲层来帮助任务最高效率的执行———写入队列的处理会尽可能的快速。该缓冲有助于控制和优化数据流经过系统的速度。  </p>
+<h2 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h2><p>&emsp;&emsp;用户不想也不需要立即处理消息。消息队列提供了异步处理机制，允许用户把一个消息放入队列，但并不立即处理它。想向队列中放入多少消息就放多少，然后在需要的时候再去处理它们。<br>&amp;emsp&amp;emsp总而言之  </p>
+<ol>
+<li>构建实时的流数据管道，可靠地获取系统和应用程序之间的数据。  </li>
+<li>构建实时流的应用程序，对数据流进行转换或反应。</li>
+</ol>
+<h1 id="常用消息系统对比"><a href="#常用消息系统对比" class="headerlink" title="常用消息系统对比"></a>常用消息系统对比</h1><ul>
+<li>RabbitMQ Erlang编写，支持多协议 AMQP，XMPP，SMTP，STOMP。支持负载均衡、数据持久化。同时 支持Peer-to-Peer和发布/订阅模式</li>
+<li>Redis 基于Key-Value对的NoSQL数据库，同时支持MQ功能，可做轻量级队列服务使用。就入队操作而言， Redis对短消息(小于10KB)的性能比RabbitMQ好，长消息的性能比RabbitMQ差。</li>
+<li>ZeroMQ 轻量级，不需要单独的消息服务器或中间件，应用程序本身扮演该角色，Peer-to-Peer。它实质上是 一个库，需要开发人员自己组合多种技术，使用复杂度高。</li>
+<li>ActiveMQ JMS实现，Peer-to-Peer，支持持久化、XA事务。</li>
+<li>Kafka/Jafka 高性能跨语言的分布式发布/订阅消息系统，数据持久化，全分布式，同时支持在线和离线处理。</li>
+<li>MetaQ/RocketMQ 纯Java实现，发布/订阅消息系统，支持本地事务和XA分布式事务。</li>
+</ul>
+<h1 id="kafka的几个概念"><a href="#kafka的几个概念" class="headerlink" title="kafka的几个概念"></a>kafka的几个概念</h1><ol>
+<li>kafka作为一个集群运行在一个或多个服务器上。</li>
+<li>kafka集群存储的消息是以topic为类别记录的。</li>
+<li>每个消息（也叫记录record，我习惯叫消息）是由一个key，一个value和时间戳构成。</li>
+</ol>
+<h1 id="kafka架构以及术语介绍"><a href="#kafka架构以及术语介绍" class="headerlink" title="kafka架构以及术语介绍"></a>kafka架构以及术语介绍</h1><p><img src="https://pic.downk.cc/item/5f96e0861cd1bbb86be8d652.jpg" alt="kafka架构"><br><img src="https://pic.downk.cc/item/5f96e0c01cd1bbb86be8e8fc.jpg" alt="kafka集群架构">  </p>
+<ul>
+<li>Producer：消息和数据的生产者，主要负责生产Push消息到指定Broker的Topic中。  </li>
+<li>Broker：Kafka节点就是被称为Broker，Broker主要负责创建Topic，存储Producer所发布的消息，记录消息处理的过程，现是将消息保存到内存中，然后持久化到磁盘。</li>
+<li>Topic：同一个Topic的消息可以分布在一个或多个Broker上，一个Topic包含一个或者多个Partition分区，数据被存储在多个Partition中。</li>
+<li>replication-factor：复制因子；这个名词在上图中从未出现，在我们下一章节创建Topic时会指定该选项，意思为创建当前的Topic是否需要副本，如果在创建Topic时将此值设置为1的话，代表整个Topic在Kafka中只有一份，该复制因子数量建议与Broker节点数量一致。</li>
+<li>Partition：分区；在这里被称为Topic物理上的分组，一个Topic在Broker中被分为1个或者多个Partition，也可以说为每个Topic包含一个或多个Partition，(一般为kafka节. 点数CPU的总核心数量)分区在创建Topic的时候可以指定。分区才是真正存储数据的单元。</li>
+<li>Consumer：消息和数据的消费者，主要负责主动到已订阅的Topic中拉取消息并消费，为什么Consumer不能像Producer一样的由Broker去push数据呢？因为Broker不知道Consumer能够消费多少，如果push消息数据量过多，会造成消息阻塞，而由Consumer去主动pull数据的话，Consumer可以根据自己的处理情况去pull消息数据，消费完多少消息再次去取。这样就不会造成Consumer本身已经拿到的数据成为阻塞状态。</li>
+<li>ZooKeeper：ZooKeeper负责维护整个Kafka集群的状态，存储Kafka各个节点的信息及状态，实现Kafka集群的高可用，协调Kafka的工作内容。</li>
+</ul>
+<h1 id="深入理解（topic与log）"><a href="#深入理解（topic与log）" class="headerlink" title="深入理解（topic与log）"></a>深入理解（topic与log）</h1><p> &emsp;&emsp; Topic是发布的消息的类别名，一个topic可以有零个，一个或多个消费者订阅该主题的消息。<br>&emsp;&emsp; 对于每个topic，Kafka集群都会维护一个分区log，就像下图中所示：<br><img src="https://pic.downk.cc/item/5f96e1c91cd1bbb86be93c54.jpg" alt="topic"><br>&emsp;&emsp;每一个分区都是一个顺序的、不可变的消息队列， 并且可以持续的添加。分区中的消息都被分了一个序列号，称之为偏移量(offset)，在每个分区中此偏移量都是唯一的。<br>Kafka集群保持所有的消息，直到它们过期（无论消息是否被消费）。实际上消费者所持有的仅有的元数据就是这个offset（偏移量），也就是说offset由消费者来控制：正常情况当消费者消费消息的时候，偏移量也线性的的增加。但是实际偏移量由消费者控制，消费者可以将偏移量重置为更早的位置，重新读取消息。可以看到这种设计对消费者来说操作自如，一个消费者的操作不会影响其它消费者对此log的处理。<br><img src="https://pic.downk.cc/item/5f96e21b1cd1bbb86be95e0e.jpg" alt="topic2"><br>&emsp;&emsp;再说说分区。Kafka中采用分区的设计有几个目的。一是可以处理更多的消息，不受单台服务器的限制。Topic拥有多个分区意味着它可以不受限的处理更多的数据。第二，分区可以作为并行处理的单元。  </p>
+<h1 id="kafka的四个核心API"><a href="#kafka的四个核心API" class="headerlink" title="kafka的四个核心API"></a>kafka的四个核心API</h1><p><img src="https://pic.downk.cc/item/5f96e2741cd1bbb86be97b14.jpg" alt="kafkaApi">  </p>
+<ul>
+<li>使用 Producer API 发布消息到kafka集群中一个或多个topic。</li>
+<li>使用 Consumer API 来订阅一个或多个topic，并处理产生的消息。</li>
+<li>使用 Streams API 充当一个流处理器，从1个或多个topic消费输入流，并生产输出流到1个或多个输出topic，有效地将输入流转换到输出流。</li>
+<li>使用Connector API可以构建和运行可重复使用的生产者或消费者，将topic连接到现有的应用程序或数据系统。例如，针对关系型数据库的连接器可以捕获到表的每个变化。  </li>
+</ul>
+<h1 id="kafka在windows简单使用"><a href="#kafka在windows简单使用" class="headerlink" title="kafka在windows简单使用"></a>kafka在windows简单使用</h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;后缀为.bat的为window下的运行质指令,linux下的运行指令的后缀为.sh  </span><br><span class="line">启动zookeeper： .\zookeeper-server-start.bat ..\..\config\zookeeper.properties  </span><br><span class="line">启动kafka： .\kafka-server-start.bat ..\..\config\server.properties    </span><br><span class="line">创建一个topic：.\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test  </span><br><span class="line"> --zookeeper: 指定了kafka所连接的zookeeper服务地址  </span><br><span class="line"> --topic：指定创建主题的名称  </span><br><span class="line"> --partition：指定了分区的个数  </span><br><span class="line"> --replication：指定了副本因子  </span><br><span class="line"> --create：创建主题的动作指令  </span><br><span class="line"> 查看已创建topic： .\kafka-topics.bat  --zookeeper localhost:2181 --list  </span><br><span class="line"> 查看某一主题详情： .\kafka-topic.bat --zookeeper localhost:2181 --describe --topic test  </span><br><span class="line"> &quot;leader&quot;：该节点负责该分区的所有的读和写，每个节点的leader都是随机选择的。  </span><br><span class="line"> &quot;replicas&quot;：备份的节点列表，无论该节点是否是leader或者目前是否还活着，只是显示。  </span><br><span class="line"> &quot;isr&quot;：“同步备份”的节点列表，也就是活着的节点并且正在同步leader。  </span><br><span class="line"> 创建一个消息消费者： .\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning  </span><br><span class="line"> 创建一个消息生产者： .\kafka-console-producer.bat --broker-list localhost:9092 --topic test  </span><br><span class="line"> 删除某个topic .&#x2F;kafka-topics.bat --zookeeper localhost:2181 --delete -topic spring-kafka-demo  </span><br></pre></td></tr></table></figure>
+
+<h2 id="纠错提醒"><a href="#纠错提醒" class="headerlink" title="纠错提醒"></a>纠错提醒</h2><p>&emsp;&emsp;若在cmd中出现命令行太长 命令语法不正确时，说明你文件夹放得太深了，所以尽量直接放在D盘下就行。  </p>
+<h1 id="springboot整合kafka"><a href="#springboot整合kafka" class="headerlink" title="springboot整合kafka"></a>springboot整合kafka</h1><h2 id="依赖导入"><a href="#依赖导入" class="headerlink" title="依赖导入"></a>依赖导入</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;  </span><br><span class="line">    &lt;groupId&gt;org.springframework.kafka&lt;/groupId&gt;  </span><br><span class="line">    &lt;artifactId&gt;spring-kafka-test&lt;/artifactId&gt;  </span><br><span class="line">    &lt;scope&gt;test&lt;/scope&gt;  </span><br><span class="line">&lt;/dependency&gt;  </span><br><span class="line"></span><br><span class="line">&lt;dependency&gt;  </span><br><span class="line">    &lt;groupId&gt;com.alibaba&lt;/groupId&gt;  </span><br><span class="line">    &lt;artifactId&gt;fastjson&lt;/artifactId&gt;  </span><br><span class="line">    &lt;version&gt;1.2.57&lt;/version&gt;  </span><br><span class="line">&lt;/dependency&gt;  </span><br><span class="line"></span><br><span class="line">&lt;dependency&gt;  </span><br><span class="line">    &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;  </span><br><span class="line">    &lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;  </span><br><span class="line">    &lt;version&gt;2.11.2&lt;/version&gt;  </span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">```  </span><br><span class="line">##  项目结构  </span><br><span class="line">![](https:<span class="comment">//pic.downk.cc/item/5f96e4931cd1bbb86bea1b04.png)  </span></span><br><span class="line">## 配置文件（yml） </span><br><span class="line">``` java</span><br><span class="line">spring:  </span><br><span class="line">  kafka:  </span><br><span class="line">    bootstrap-servers: 127.0.0.1:9092 #指定kafka server的地址，集群配多个，中间，逗号隔开  </span><br><span class="line">   <span class="comment">// producer:  </span></span><br><span class="line">   <span class="comment">//   key-serializer: org.apache.kafka.common.serialization.StringSerializer  </span></span><br><span class="line">   <span class="comment">//   value-serializer: com.cxh.kafka.serializer.HashMapSerializer   //序列化以后再用  </span></span><br><span class="line">    consumer:  </span><br><span class="line">      group-id: default_consumer_group #群组ID  </span><br><span class="line">      enable-auto-commit: <span class="keyword">true</span>  </span><br><span class="line">      auto-commit-interval: <span class="number">1000</span>  </span><br><span class="line">      <span class="comment">//key-deserializer: org.apache.kafka.common.serialization.StringDeserializer  </span></span><br><span class="line">     <span class="comment">// value-deserializer: com.cxh.kafka.serializer.HashMapDeserializer  </span></span><br><span class="line">server:  </span><br><span class="line">  port: <span class="number">8500</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="生产者文件"><a href="#生产者文件" class="headerlink" title="生产者文件"></a>生产者文件</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cxh.kafka.controller;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;  </span><br><span class="line"><span class="keyword">import</span> org.springframework.kafka.core.KafkaTemplate;  </span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;  </span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;  </span><br><span class="line"><span class="keyword">import</span> java.util.Map;  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span>  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProducerController</span> </span>&#123;  </span><br><span class="line">    <span class="meta">@Autowired(required = false)</span>  </span><br><span class="line">    <span class="keyword">private</span> KafkaTemplate&lt;String,Object&gt; kafkaTemplate;  </span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/send&quot;)</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">send</span><span class="params">(String msg)</span></span>&#123;  </span><br><span class="line">        <span class="comment">//序列化再使用  </span></span><br><span class="line">      <span class="comment">//  Map&lt;String,Integer&gt; map = new HashMap();  </span></span><br><span class="line">      <span class="comment">//  map.put(&quot;xiaochen&quot;,18);  </span></span><br><span class="line">        kafkaTemplate.send(<span class="string">&quot;test&quot;</span>, <span class="string">&quot;hello kafka&quot;</span>); <span class="comment">//使用kafka模板发送信息  </span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;success&quot;</span>;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="消费者文件"><a href="#消费者文件" class="headerlink" title="消费者文件"></a>消费者文件</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> com.cxh.kafka.consumer;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRecord;  </span><br><span class="line"><span class="keyword">import</span> org.springframework.kafka.annotation.KafkaListener;  </span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span>  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Consumer</span> </span>&#123;  </span><br><span class="line">    <span class="comment">/**  </span></span><br><span class="line"><span class="comment">     * 定义此消费者接收topics = &quot;demo&quot;的消息，与controller中的topic对应上即可  </span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> record 变量代表消息本身，可以通过ConsumerRecord&lt;?,?&gt;类型的record变量来打印接收的消息的各种信息  </span></span><br><span class="line"><span class="comment">     */</span>  </span><br><span class="line">    <span class="meta">@KafkaListener(topics = &quot;test&quot;)</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">listen</span> <span class="params">(ConsumerRecord&lt;?, ?&gt; record)</span></span>&#123;  </span><br><span class="line">    System.out.println(<span class="string">&quot;消费&quot;</span>);  </span><br><span class="line">    System.out.println(<span class="string">&quot;topic&quot;</span>+record.topic());  </span><br><span class="line">    System.out.println(<span class="string">&quot;offset&quot;</span>+record.offset());  </span><br><span class="line">    System.out.println(<span class="string">&quot;value&quot;</span>+record.value());  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="启动调用接口即可看见-本实例暂未实现序列化。"><a href="#启动调用接口即可看见-本实例暂未实现序列化。" class="headerlink" title="启动调用接口即可看见,本实例暂未实现序列化。"></a>启动调用接口即可看见,本实例暂未实现序列化。</h2>]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+        <tag>kafka</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>正则表达式</title>
     <url>/2020/10/22/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/</url>
-    <content><![CDATA[<p>quikly demo</p>
+    <content><![CDATA[<p><code>System.out.println(&quot;hello world&quot;)</code></p>
 ]]></content>
       <categories>
         <category>Algorithm</category>
