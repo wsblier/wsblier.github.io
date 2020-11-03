@@ -20,6 +20,53 @@
 ]]></content>
   </entry>
   <entry>
+    <title>IDEA快捷键操作</title>
+    <url>/2020/11/03/IDEA%E5%BF%AB%E6%8D%B7%E9%94%AE%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<h1 id="常用快捷键"><a href="#常用快捷键" class="headerlink" title="常用快捷键"></a>常用快捷键</h1><ul>
+<li>Ctrl+AlT+L&emsp;一键格式化代码</li>
+<li>Ctrl+Shfit+R&emsp;全局搜索替换</li>
+<li>Shift+Shfit&emsp;强大的搜索功能ctrl+shfit+r搜索类 ctrl+n按照类名搜索类<a id="more"></a></li>
+</ul>
+<ol>
+<li>ctrl+shift+enter&emsp;&emsp;语句完成</li>
+<li>“!” 否定完成,输入表达式时按！键</li>
+<li>Ctrl+E&emsp;&emsp;最近的文件</li>
+<li>Ctrl+Shift+E&emsp;最近更改的文件</li>
+<li>Shfit+Click&emsp;关闭文件</li>
+<li>Ctrl+[OR]&emsp;可以跑到大括号的开头与结尾</li>
+<li>Ctrl+F12&emsp; 显示当前文件结构</li>
+<li>Ctrl+F7&emsp;查询元素在当前文件的引用</li>
+<li>Alt+Q&emsp;查看当前方法的声明</li>
+<li>Ctrl+P&emsp;显示参数信息</li>
+<li>Alt+Insert&emsp;生成构造器</li>
+<li>Ctrl+Alt+T&emsp;可以将代码包在一个块内，如try、cacth</li>
+<li>Ctrl+enter&emsp;自动导入包</li>
+<li>Ctrl+Alt+L&emsp;格式化代码</li>
+<li>Ctrl+ALT+O&emsp;优化导入的类和包</li>
+<li>Ctrl+R&emsp;替换文本</li>
+<li>Ctrl+F&emsp;查找文本</li>
+<li>Shit+F6&emsp;重构，重命名</li>
+<li>Ctrl+X&emsp;删除行</li>
+<li>Ctrl+D&emsp;复制行</li>
+<li>Ctrl+/或Ctrl+Shift+/&emsp;注释</li>
+<li>Alt+F1&emsp;查找代码所在位置</li>
+<li>Alt+Up/Down&emsp;在方法间快速移动</li>
+<li>Alt+F3&emsp;逐个往下查找相同文本，并高亮显示</li>
+<li>Ctrl+O&emsp;重写方法</li>
+<li>Ctrl+Shfit+U&emsp;大小写转换</li>
+<li>Ctrl+Y&emsp;删除当前行</li>
+<li>Shift+Enter&emsp;向下插入新行</li>
+<li>Ctrl+F&emsp;查找</li>
+<li>Ctrl+R&emsp;替换</li>
+<li>F3&emsp;查找下一个</li>
+<li>Shfit+F3;查找上一个</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>IDEA</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Kafka学习</title>
     <url>/2020/10/26/Kafka%E5%AD%A6%E4%B9%A0/</url>
     <content><![CDATA[<h1 id="Kafaka简介"><a href="#Kafaka简介" class="headerlink" title="Kafaka简介"></a>Kafaka简介</h1><p>&emsp;&emsp;Kafka是最初由Linkedin公司开发，是一个分布式、分区的、多副本的、多订阅者，基于zookeeper协调的分布式日志系统（也可以当做MQ系统），常见可以用于web/nginx日志、访问日志，消息服务等等，Linkedin于2010年贡献给了Apache基金会并成为顶级开源项目。 </p>
